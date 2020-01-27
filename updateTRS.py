@@ -11,7 +11,7 @@ def checkData(input_feeder,input_data):
   rowCount = 0
   #checking input data path for null records. If no null records STOP
   if input_data == capacitors:
-    #do special search on subtype
+    #do unique search on subtypes
     with arcpy.da.SearchCursor(capacitors, "OBJECTID", """(FEEDERID = {0}) AND (SUBTYPECD = 1 OR SUBTYPECD = 2) AND (TRS IS NULL)""".format(input_feeder)) as cursor:
       for row in cursor:
         rowCount += 1
@@ -47,7 +47,7 @@ def checkData(input_feeder,input_data):
 
 ####START FUNCTION####
 def trsFunct(feeder,data):  
-  trs = r'E:\Apps\Application Launch\Electric\CVMWNT0146_GISLand.sde\GISLand.DBO.Land\GISLand.DBO.SectionPoly'
+  trs = #path to section polygon AKA town range section FC
   #create layer from trs FC to conduct select by location
   trsLyr = arcpy.MakeFeatureLayer_management(trs, 'in_memory\\trsOutput_lyr')
 
@@ -103,7 +103,7 @@ def trsFunct(feeder,data):
         dataUpdateList.append(row[0])
 
     #set workspace
-    workspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+    workspace = #SDE connection file
 
     # Start an edit session. Must provide the worksapce.
     edit = arcpy.da.Editor(workspace)
@@ -119,8 +119,6 @@ def trsFunct(feeder,data):
     for j in dataUpdateList: #input dataset Object ID
       with arcpy.da.UpdateCursor(data, "TRS", """OBJECTID ={0}""".format(j)) as cursor: #cursor running on input dataset
         for row in cursor:
-          #!sectionName = trsDict[i]
-          #!row[0] = sectionName
           row[0] = trsDict[i]
           cursor.updateRow(row) 
 
@@ -165,25 +163,21 @@ elif len(csvList) == 0 and len(singleList) > 0:
 	feederList = singleList
 
 #set data paths
-miscNetFeat = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.MiscNetworkFeature'
-fuse = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.Fuse'
-dpd = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.DynamicProtectiveDevice'
-switch = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.Switch'
+miscNetFeat = #path to taps, T-points, & wire changes
+fuse = #path to fuses
+dpd = #path to dynamic protective device
+switch = #path to switch
 #!!!capacitors from PF correcting  subtypes 1, 2
-capacitors = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PFCorrectingEquipment'
+capacitors = #path to PF correcting equipment
 #!!!isolator from Transformer fc subtypes 10
-isolator = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.Transformer'
+isolator = #path to transformer
 #!!!rb from voltage regulator fc subtypes 1, 5, 8, 11
-rb = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.VoltageRegulator'
+rb = #path to voltage regulator
 
 #list of all input data paths to loop through
 dataPathList = [capacitors, isolator, rb, fuse, dpd, switch, miscNetFeat]
 feederList = [
-'040901',
-'040901',
-'040903',
-'147601',
-'147602'
+
 ]
 ### This is all for checking if the input data needs to be updated ###
 for feederID in feederList:
