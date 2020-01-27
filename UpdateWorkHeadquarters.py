@@ -1,5 +1,5 @@
 '''
-This script is being developed for the purpose of updating the work headquarters field for the following feature classes:
+This script was developed to update the work headquarters field for the following feature classes in a batch process:
                     1.	Dynamic Protective Device
                     2.	Fuse
                     3.	Miscellaneous Network Features (MNF) 
@@ -11,8 +11,6 @@ This script is being developed for the purpose of updating the work headquarters
                     9.	Switch
                     10.	Transformer
                     11.	Voltage Regulator (Regulators and Boosters in ArcMap TOC)
-                    
-                    **** Maybe remove the "IS NULL" part of the SQL selection so every record for a feederID is updated properly ****
 '''
 def calculateHQ(feederID,dataPath,workHeadquarters):
     updateFields = ["WORKHEADQUARTERS"]
@@ -22,7 +20,7 @@ def calculateHQ(feederID,dataPath,workHeadquarters):
         SQL = """{0} = '{1}'""".format(arcpy.AddFieldDelimiters(dataPath,feederField),feeder)
 
         #set workspace
-        workspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+        workspace = #SDE connection file
         
         # Start an edit session. Must provide the worksapce.
         edit = arcpy.da.Editor(workspace)
@@ -49,11 +47,9 @@ def calculateHQ(feederID,dataPath,workHeadquarters):
         
 #### Function Parameters ####
 feederID = [
-'127301',
-'127302'
 
 ]
-workHeadquarters = 'TWS'
+workHeadquarters = ''
 priOH = r'Primary Lines\Primary Overhead Conductor'
 priUG = r'Primary Lines\Primary Underground Conductor'
 secOH = r'Customers & Transformers\Secondary Overhead Conductor'
@@ -78,3 +74,6 @@ calculateHQ(feederID, miscNetFeat, workHeadquarters)
 calculateHQ(feederID, capacitor, workHeadquarters)
 calculateHQ(feederID, transformer, workHeadquarters)
 calculateHQ(feederID, regulatorBooster, workHeadquarters)
+
+### EOlson 05/2019 ###
+### rosemary.erin.o@gmail.com ###
