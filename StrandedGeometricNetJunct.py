@@ -1,6 +1,6 @@
 '''
-This script is used to find and retreive the object IDs of geometric network junctions that are intersected by a line FC.
-***When using this script be sure not to save any changes to the .mxd
+This script was developed to identify and retreive the object IDs of geometric network junctions (ArcFM) that are snapped
+to a line feature class. All stranded geometric network junctions can be deleted by the GIS Analyst.
 '''
 #Arcmap settings
 arcpy.env.addOutputsToMap = False
