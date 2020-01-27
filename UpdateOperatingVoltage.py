@@ -1,7 +1,8 @@
 '''
 ########## PRODUCTION SCRIPT ##########
-This script is being developed for the purpose of updating the Operating Voltage fields for select feature classes. Operating voltages
-are only updated on feeder IDs without isolators and any feeder IDs that contain isolators will be printed at the end of the program. 
+This script was developed for the purpose of updating the Operating Voltage fields for select feature classes. Operating 
+voltages are only updated on feeder IDs without isolators. Any feeder IDs that contain isolators will be printed at the 
+end of the program so GIS Analysts can easily identify and update them manually. 
 '''
 
 
@@ -14,7 +15,7 @@ def updateOpVoltage(opVoltage,dataPath,feederID):
     
     #Start Editing operation
     #set workspace
-    workspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+    workspace = 
 
     # Start an edit session. Must provide the worksapce.
     edit = arcpy.da.Editor(workspace)
@@ -49,7 +50,7 @@ def secOpVoltage(dataPath,feederID):
     
     #Start Editing operation
     #set workspace
-    workspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+    workspace = 
 
     # Start an edit session. Must provide the worksapce.
     edit = arcpy.da.Editor(workspace)
@@ -95,12 +96,11 @@ secUG = r'Customers & Transformers\Secondary Underground Conductor'
 
 ####Input tables####
 isolator = r'Devices\Primary Devices\Isolator'
-circuitSource = r'E:\Data\EROlson\test.gdb\circuitSource'
+circuitSource = #input local path to circuit source table 
 
 #### Initiate for loop to loop through list of Feeder IDs ####
 feederIDList = [
-'156201',
-'156202'
+
 ]
 
 #variable for tracking feeder IDs with isolators
