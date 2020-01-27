@@ -39,3 +39,6 @@ def tlm_move(i):
         row[0]=tlm_091601
         cursor.updateRow(row)  
     edit.stopOperation()
+
+### EOlson 01/2020 ###
+### rosemary.erin.o@gmail.com ###
