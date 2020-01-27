@@ -1,3 +1,19 @@
+'''
+This script was developed to identify which TRS polygon each object belonging to the following feature classes resided in and
+updating attributes accordingly:
+	- Capacitors
+	- Isolator 
+	- Regulators and Boosters
+	- Fuse
+	- Dynamic Protective Device
+	- Switch
+	- Miscellaneous Network Features
+
+This requires relatively intensive geoprocessing tasks on potentially thousands of features and thus required the script to 
+be optimized for speed by reducing geodatabase transactions and avoiding unnecessary data processing.
+
+Can be run as a stand alone script or used as a toolbox.
+'''
 #Necessary modules 
 import arcpy
 import os
@@ -186,3 +202,6 @@ for feederID in feederList:
       trsFunct(feederID,inData)
     else:
       continue
+
+### EOlson 12/2019 ###
+### rosemary.erin.o@gmail.com ###
