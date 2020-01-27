@@ -56,3 +56,6 @@ for i in selectByList:
     del cursor
 
 print geoNetJunctIntersectedList 
+
+### EOlson 01/2020 ###
+### rosemary.erin.o@gmail.com ###
