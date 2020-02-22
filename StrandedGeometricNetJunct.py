@@ -8,25 +8,25 @@ arcpy.env.addOutputsToMap = False
 ###input data paths###
 
 #OH Connector Line
-OHline = r'Customers & Transformers\Transformer Connector Lines\OH Connector Line'
+OHline = r'xxxxxx\xxxxxx\OH Connector Line'
 
 #UG Connector Line
-UGline = r'Customers & Transformers\Transformer Connector Lines\UG Connector Line'
+UGline = r'xxxxxx\xxxxxx\UG Connector Line'
 
 #Primary Overhead dataset
-priOH = r'Primary Lines\Primary Overhead Conductor'
+priOH = r'xxxxxx\Primary Overhead Conductor'
 
 #Primary Underground dataset
-priUG = r'Primary Lines\Primary Underground Conductor'
+priUG = r'xxxxxx\Primary Underground Conductor'
 
 #Secondary Overhead dataset
-secOH = r'Customers & Transformers\Secondary Overhead Conductor'
+secOH = r'xxxxxx\Secondary Overhead Conductor'
 
 #Secondary Underground dataset
-secUG = r'Customers & Transformers\Secondary Underground Conductor'
+secUG = r'xxxxxx\Secondary Underground Conductor'
 
 #Geometric Network junctions dataset
-geoNetJunct = r'Misc Network Features\ELECDIST.ElectricGeomNetwork_Junctions'
+geoNetJunct = r'xxxxxx\ELECDIST.ElectricGeomNetwork_Junctions'
 
 ###Find geometric network junctions attached to lines --> delete all others###
 
