@@ -1,11 +1,6 @@
-# CMS-Energy-ArcSDE-py-scripts
-
-These scripts are used to conduct geoprocessing tasks within:
-<ul>
-  <li> ArcGIS ArcSDE versioned geodatabase </li>
-  <li> ArcFM Utility Geometric Network </li>
-</ul>
-
-Some scripts have been designed to be used as a python toolbox while others operate directly from the python window in ArcGIS.
-Most scripts are used for daily data remediation tasks to ensure data integrity and greatly increase Analyst's efficency by 
-updating data in batch processes.
+<h1>Consumers Energy - Python Scripts</h1>
+<p>This is a repository of python scripts developed for ArcSDE geodatabases at Consumers Energy. They are a variety of scripts that were developed to enhance daily data remediation tasks and ensure geodatabase data integrity. These scripts conduct processes on geodatabases with advanced behavior such as: topology, utility geometric networks, and data versioning.</p>
+<h2>Note:</h2>
+<p>All data and file paths have been removed from these scripts and replaced with 'xxxxxx'</p>
+<h2>Contributers & Maintainers</h2>
+<p>All scripts are developed and maintained by me.</p>
