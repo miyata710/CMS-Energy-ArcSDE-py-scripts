@@ -51,10 +51,10 @@ feederID = [
 
 ]
 
-priOH = r'Primary Lines\Primary Overhead Conductor'
-priUG = r'Primary Lines\Primary Underground Conductor'
-secOH = r'Customers & Transformers\Secondary Overhead Conductor'
-secUG = r'Customers & Transformers\Secondary Underground Conductor'
+priOH = r'xxxxxx\Primary Overhead Conductor'
+priUG = r'xxxxxx\Primary Underground Conductor'
+secOH = r'xxxxxx\Secondary Overhead Conductor'
+secUG = r'xxxxxx\Secondary Underground Conductor'
 
 #### Call and Execute calculate ML function on ALL necessary FCs####
 calculateML(feederID, priOH)
