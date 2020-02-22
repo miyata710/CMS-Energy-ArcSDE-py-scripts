@@ -80,22 +80,22 @@ def secOpVoltage(dataPath,feederID):
   
 
 ####Data paths being updated by updateOpVoltage() function####
-dynamicProtectiveDevice = r'Devices\Protective Devices & Switches\Dynamic Protective Device'
-fuse = r'Devices\Protective Devices & Switches\Fuse'
-miscNetFeat = r'Misc Network Features\Tap Dots, T-points, & Wire Changes'
-capacitor = r'Devices\Primary Devices\Capacitors'
-priOH = r'Primary Lines\Primary Overhead Conductor'
-priUG = r'Primary Lines\Primary Underground Conductor'
-switch = r'Devices\Protective Devices & Switches\Switch'
-transformer = r'Customers & Transformers\Secondary Transformers'
-voltageRegulator = r'Devices\Primary Devices\Regulators & Boosters'
+dynamicProtectiveDevice = r'xxxxxx\xxxxxx\Dynamic Protective Device'
+fuse = r'xxxxxx\xxxxxx\Fuse'
+miscNetFeat = r'xxxxxx\Tap Dots, T-points, & Wire Changes'
+capacitor = r'xxxxxx\Primary Devices\Capacitors'
+priOH = r'xxxxxx\Primary Overhead Conductor'
+priUG = r'xxxxxx\Primary Underground Conductor'
+switch = r'xxxxxx\xxxxxx\Switch'
+transformer = r'xxxxxx\Secondary Transformers'
+voltageRegulator = r'xxxxxx\Primary Devices\Regulators & Boosters'
 
 #### Data paths updated by secOpVoltage() function ####
-secOH = r'Customers & Transformers\Secondary Overhead Conductor'
-secUG = r'Customers & Transformers\Secondary Underground Conductor'
+secOH = r'xxxxxx\Secondary Overhead Conductor'
+secUG = r'xxxxxx\Secondary Underground Conductor'
 
 ####Input tables####
-isolator = r'Devices\Primary Devices\Isolator'
+isolator = r'xxxxxx\Primary Devices\Isolator'
 circuitSource = #input local path to circuit source table 
 
 #### Initiate for loop to loop through list of Feeder IDs ####
