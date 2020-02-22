@@ -3,14 +3,14 @@ This script was developed to update the work headquarters field for the followin
                     1.	Dynamic Protective Device
                     2.	Fuse
                     3.	Miscellaneous Network Features (MNF) 
-                    4.	PF Correcting Equipment (Capacitor in ArcMap TOC)
+                    4.	PF Correcting Equipment
                     5.	Primary Overhead Conductor
                     6.	Primary Underground Conductor
                     7.	Secondary Overhead Conductor
                     8.	Secondary Underground Conductor
                     9.	Switch
                     10.	Transformer
-                    11.	Voltage Regulator (Regulators and Boosters in ArcMap TOC)
+                    11.	Voltage Regulator
 '''
 def calculateHQ(feederID,dataPath,workHeadquarters):
     updateFields = ["WORKHEADQUARTERS"]
@@ -50,17 +50,17 @@ feederID = [
 
 ]
 workHeadquarters = ''
-priOH = r'Primary Lines\Primary Overhead Conductor'
-priUG = r'Primary Lines\Primary Underground Conductor'
-secOH = r'Customers & Transformers\Secondary Overhead Conductor'
-secUG = r'Customers & Transformers\Secondary Underground Conductor'
-dynProDev = r'Devices\Protective Devices & Switches\Dynamic Protective Device'
-fuse = r'Devices\Protective Devices & Switches\Fuse'
-switch = r'Devices\Protective Devices & Switches\Switch'
-miscNetFeat = r'Misc Network Features\Tap Dots, T-points, & Wire Changes'
-capacitor = r'Devices\Primary Devices\Capacitors'
-transformer = r'Customers & Transformers\Secondary Transformers'
-regulatorBooster = r'Devices\Primary Devices\Regulators & Boosters'
+priOH = r'xxxxxx\Primary Overhead Conductor'
+priUG = r'xxxxxx\Primary Underground Conductor'
+secOH = r'xxxxxx\Secondary Overhead Conductor'
+secUG = r'xxxxxx\Secondary Underground Conductor'
+dynProDev = r'xxxxxx\Protective Devices & Switches\Dynamic Protective Device'
+fuse = r'xxxxxx\Protective Devices & Switches\Fuse'
+switch = r'xxxxxx\Protective Devices & Switches\Switch'
+miscNetFeat = r'xxxxxx\Tap Dots, T-points, & Wire Changes'
+capacitor = r'xxxxxx\Primary Devices\Capacitors'
+transformer = r'xxxxxx\Secondary Transformers'
+regulatorBooster = r'xxxxxx\Primary Devices\Regulators & Boosters'
 
 #### Call and Execute function on ALL necessary FCs####
 calculateHQ(feederID, priOH, workHeadquarters)
