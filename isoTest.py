@@ -46,19 +46,19 @@ def updateOpVoltage(opVoltage,dataPath,userWorkspace):
 
     # Start an edit operation
     edit.startOperation()
-    
+
     #return all records in input dataPath with matching feederid and only provide "OPERATINGVOLTAGE" field for updating
     updateCursor = arcpy.da.UpdateCursor(dataPath, "OPERATINGVOLTAGE", SQL)
 
     #track number of features per feature class that are updated
     count = 0
-    
+
     for row in updateCursor:
       row[0] = str(opVoltage)
       updateCursor.updateRow(row)
       count += 1
     del updateCursor
-    
+
     # Stop the edit operation.
     edit.stopOperation()
 
