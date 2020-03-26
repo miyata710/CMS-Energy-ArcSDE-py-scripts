@@ -63,12 +63,17 @@ def updateOpVoltage(opVoltage,dataPath,userWorkspace):
     edit.stopOperation()
 
     #print messages based on dataset for count variable
+    #!print dataPath
     spltPath = dataPath.split(".")
+    #!print spltPath
     spltPath.reverse()
+    #!print spltPath
     printThis = spltPath[0]
+    #!print printThis
     #Prints the data path and number of records updated to the tool dialog box
-    arcpy.AddMessage("{0}: {1}").format(printThis,count)
-
+    #!arcpy.AddMessage("{0}: {1}").format(printThis,count)
+    #!arcpy.AddMessage(printThis + " " + str(count))
+    print printThis + " " + str(count)
 ########## END OF FUNCTION ########## 
 
 ########## SECONDARY LINE OP VOLTAGE FUNCTION ##########
@@ -111,7 +116,8 @@ def secOpVoltage(dataPath,userWorkspace):
     spltPath.reverse()
     printThis = spltPath[0]
     #Prints the data path and number of records updated to the tool dialog box
-    arcpy.AddMessage("{0}: {1}").format(printThis,count)
+    #!arcpy.AddMessage("{0}: {1}").format(printThis,count)
+    print printThis + " " + str(count)
 
 ########## END OF FUNCTION ##########
   
@@ -161,7 +167,7 @@ for i in listMainData:
   updateOpVoltage(opVoltage,i,userWorkspace)
   
 for j in listSecondaryData:
-    print j
+  print j
   secOpVoltage(j,userWorkspace)
 
 ### EOlson 03/2020 ###
