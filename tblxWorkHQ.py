@@ -77,6 +77,7 @@ txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs
 workHQ_input = arcpy.GetParameterAsText (2) # work headquarters code
 
 #makes a list of feeder IDs from a TXT file
+feederList = []
 if txt_input :
     fhand = open(txt_input)
     for i in fhand:
