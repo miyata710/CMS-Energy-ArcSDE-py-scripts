@@ -23,30 +23,27 @@ arcpy.env.addOutputsToMap = False
 def calculateHQ(feederID,dataPath,workHeadquarters,userWorkspace):
     #assign correct SQL statemnet
     if dataPath == capacitor:
-      SQL =  """(FEEDERID = {0}) AND (SUBTYPECD = 1 OR SUBTYPECD = 2)""".format(feederID)
+      SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD = 1 OR SUBTYPECD = 2) AND (WORKHEADQUARTERS IS NULL OR NOT WORKHEADQUARTERS= '{1}')""".format(feederID,workHeadquarters)
 
     elif dataPath == priOH:
-        SQL =  """(FEEDERID = {0}) AND (SUBTYPECD <> 7)""".format(feederID)
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 7) AND (WORKHEADQUARTERS IS NULL OR NOT WORKHEADQUARTERS= '{1}')""".format(feederID,workHeadquarters)
         
     elif dataPath == priUG:
-        SQL =  """(FEEDERID = {0}) AND (SUBTYPECD <> 7)""".format(feederID)
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 7) AND (WORKHEADQUARTERS IS NULL OR NOT WORKHEADQUARTERS= '{1}')""".format(feederID,workHeadquarters)
 
     elif dataPath == transformer:
-        SQL =  """(FEEDERID = {0}) AND (SUBTYPECD <> 10) AND (INSTALLATIONTYPE <> 'UN' OR INSTALLATIONTYPE IS NULL) """.format(feederID)
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 10) AND (INSTALLATIONTYPE <> 'UN' OR INSTALLATIONTYPE IS NULL) AND (WORKHEADQUARTERS IS NULL OR NOT WORKHEADQUARTERS= '{1}')""".format(feederID,workHeadquarters)
 
     elif dataPath == rb:
-        SQL =  """(FEEDERID = {0}) AND (SUBTYPECD = 1 OR SUBTYPECD = 5 OR SUBTYPECD = 8 OR SUBTYPECD = 11)""".format(feederID)
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD = 1 OR SUBTYPECD = 5 OR SUBTYPECD = 8 OR SUBTYPECD = 11)AND (WORKHEADQUARTERS IS NULL OR NOT WORKHEADQUARTERS= '{1}')""".format(feederID,workHeadquarters)
 
     else:
-        SQL =  """(FEEDERID = {0})""".format(feederID)
-    print SQL #! for testing only	
+        SQL =  """(FEEDERID = '{0}') AND (WORKHEADQUARTERS IS NULL OR NOT WORKHEADQUARTERS= '{1}')""".format(feederID,workHeadquarters)	
     
     updateFields = ["WORKHEADQUARTERS"]
     feederField = "FEEDERID"
     workHQField = "WORKHEADQUARTERS"
     
-
-	
     #set workspace
     workspace = userWorkspace
 
@@ -75,22 +72,17 @@ def calculateHQ(feederID,dataPath,workHeadquarters,userWorkspace):
        
 #### Get input from user ####
 # Script input parameters:
-#!sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
-#!txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs 
-#!workHQ_input = arcpy.GetParameterAsText (2) # work headquarters code
-sdeWorkspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
-#!txt_input = ['122601']
-workHQ_input = 'KAL'
+sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
+txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs 
+workHQ_input = arcpy.GetParameterAsText (2) # work headquarters code
+
 #makes a list of feeder IDs from a TXT file
-feederList = ['122601']
-'''
 if txt_input :
     fhand = open(txt_input)
     for i in fhand:
         i = i.strip()
 	feederList.append(str(i))
     fhand.close()
-'''
 
 ###Data paths being updated by calculateHQ() function####
 
@@ -116,7 +108,6 @@ dataList = [priOH, priUG, secOH, secUG, dynProDev, fuse, switch, miscNetFeat, ca
 
 for feeder in feederList:
     for data in dataList:
-	#### Call and Execute function on ALL necessary FCs####
         calculateHQ(feeder, data, workHQ_input, sdeWorkspace)
 
 
