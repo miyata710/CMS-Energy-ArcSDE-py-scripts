@@ -11,9 +11,6 @@ This script is being developed for the purpose of updating the work headquarters
                     9.	Switch
                     10.	Transformer
                     11.	Voltage Regulator (Regulators and Boosters in ArcMap TOC)
-                    
-                    **** Maybe remove the "IS NULL" part of the SQL selection so every record for a feederID is updated properly ****
-
 '''
 #Necessary modules 
 import arcpy
@@ -74,7 +71,7 @@ def calculateHQ(feederID,dataPath,workHeadquarters,userWorkspace):
        
 #### Get input from user ####
 # Script input parameters:
-userWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
+sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
 txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs 
 workHQ_input = arcpy.GetParameterAsText (2) # work headquarters code
 
@@ -90,31 +87,31 @@ if txt_input :
 ###Data paths being updated by calculateHQ() function####
 
 #!!! SUBTYPECD <> 7
-priOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriOHElectricLineSegment".format(userWorkspace)
+priOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriOHElectricLineSegment".format(sdeWorkspace)
 #!!!SUBTYPECD <> 7
-priUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriUGElectricLineSegment".format(userWorkspace)
-secOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecOHElectricLineSegment".format(userWorkspace)
-secUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecUGElectricLineSegment".format(userWorkspace)
-dynProDev = "{0}\\ELECDIST.ElectricDist\\ELECDIST.DynamicProtectiveDevice".format(userWorkspace)
-fuse = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Fuse".format(userWorkspace)
-switch = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Switch".format(userWorkspace)
-miscNetFeat = "{0}\\ELECDIST.ElectricDist\\ELECDIST.MiscNetworkFeature".format(userWorkspace)
+priUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriUGElectricLineSegment".format(sdeWorkspace)
+secOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecOHElectricLineSegment".format(sdeWorkspace)
+secUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecUGElectricLineSegment".format(sdeWorkspace)
+dynProDev = "{0}\\ELECDIST.ElectricDist\\ELECDIST.DynamicProtectiveDevice".format(sdeWorkspace)
+fuse = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Fuse".format(sdeWorkspace)
+switch = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Switch".format(sdeWorkspace)
+miscNetFeat = "{0}\\ELECDIST.ElectricDist\\ELECDIST.MiscNetworkFeature".format(sdeWorkspace)
 #!!!capacitors from PF correcting  subtypes 1, 2
-capacitor = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PFCorrectingEquipment".format(userWorkspace)
+capacitor = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PFCorrectingEquipment".format(sdeWorkspace)
 #!!!SUBTYPECD <> 10 and (INSTALLATIONTYPE <> 'UN' or INSTALLATIONTYPE is null)
-transformer = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Transformer".format(userWorkspace)
+transformer = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Transformer".format(sdeWorkspace)
 #!!!rb from voltage regulator fc subtypes 1, 5, 8, 11
-rb = "{0}\\ELECDIST.ElectricDist\\ELECDIST.VoltageRegulator".format(userWorkspace)
+rb = "{0}\\ELECDIST.ElectricDist\\ELECDIST.VoltageRegulator".format(sdeWorkspace)
 
 #### Call and Execute function on ALL necessary FCs####
-calculateHQ(feederList, priOH, workHQ_input)
-calculateHQ(feederList, priUG, workHQ_input)
-calculateHQ(feederList, secOH, workHQ_input)
-calculateHQ(feederList, secUG, workHQ_input)
-calculateHQ(feederList, dynProDev, workHQ_input)
-calculateHQ(feederList, fuse, workHQ_input)
-calculateHQ(feederList, switch, workHQ_input)
-calculateHQ(feederList, miscNetFeat, workHQ_input)
-calculateHQ(feederList, capacitor, workHQ_input)
-calculateHQ(feederList, transformer, workHQ_input)
-calculateHQ(feederList, regulatorBooster, workHQ_input)
+calculateHQ(feederList, priOH, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, priUG, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, secOH, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, secUG, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, dynProDev, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, fuse, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, switch, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, miscNetFeat, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, capacitor, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, transformer, workHQ_input, sdeWorkspace)
+calculateHQ(feederList, regulatorBooster, workHQ_input, sdeWorkspace)
