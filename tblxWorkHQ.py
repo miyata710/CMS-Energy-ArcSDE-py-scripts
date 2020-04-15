@@ -19,6 +19,7 @@ import os
 #ArcMap Settings
 arcpy.env.addOutputsToMap = False
 
+#### Start function ####
 def calculateHQ(feederID,dataPath,workHeadquarters,userWorkspace):
     #assign correct SQL statemnet
     if dataPath == capacitor:
@@ -38,36 +39,38 @@ def calculateHQ(feederID,dataPath,workHeadquarters,userWorkspace):
 
     else:
         SQL =  """(FEEDERID = {0})""".format(feederID)
-    
-    for feeder in feederID:
-    
+	
     updateFields = ["WORKHEADQUARTERS"]
     feederField = "FEEDERID"
     workHQField = "WORKHEADQUARTERS"
-    #set workspace
-    workspace = userWorkspace
+    
+    for feeder in feederID:
+	
+	#set workspace
+	workspace = userWorkspace
 
-    # Start an edit session. Must provide the worksapce.
-    edit = arcpy.da.Editor(workspace)
+	# Start an edit session. Must provide the worksapce.
+	edit = arcpy.da.Editor(workspace)
 
-    # Edit session is started without an undo/redo stack for versioned data
-    #  (for second argument, use False for unversioned data)
-    edit.startEditing(False, True)
+	# Edit session is started without an undo/redo stack for versioned data
+	#  (for second argument, use False for unversioned data)
+	edit.startEditing(False, True)
 
-    # Start an edit operation
-    edit.startOperation()
+	# Start an edit operation
+	edit.startOperation()
 
-    updateCursor = arcpy.da.UpdateCursor(dataPath,updateFields,SQL)
-    for row in updateCursor:
-        row[0] = workHeadquarters
-        updateCursor.updateRow(row)
-    del updateCursor
+	updateCursor = arcpy.da.UpdateCursor(dataPath,updateFields,SQL)
+	for row in updateCursor:
+	    row[0] = workHeadquarters
+	    updateCursor.updateRow(row)
+	del updateCursor
 
-    # Stop the edit operation.
-    edit.stopOperation()
+	# Stop the edit operation.
+	edit.stopOperation()
 
-    # Stop the edit session and save the changes
-    edit.stopEditing(True)
+    	# Stop the edit session and save the changes
+    	edit.stopEditing(True)
+#### End function ####
        
 #### Get input from user ####
 # Script input parameters:
@@ -78,11 +81,11 @@ workHQ_input = arcpy.GetParameterAsText (2) # work headquarters code
 #makes a list of feeder IDs from a TXT file
 feederList = []
 if txt_input :
-	fhand = open(txt_input)
-	for i in fhand:
-		i = i.strip()
-		feederList.append(str(i))
-	fhand.close()
+    fhand = open(txt_input)
+    for i in fhand:
+        i = i.strip()
+	feederList.append(str(i))
+    fhand.close()
 
 ###Data paths being updated by calculateHQ() function####
 
