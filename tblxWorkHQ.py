@@ -39,53 +39,58 @@ def calculateHQ(feederID,dataPath,workHeadquarters,userWorkspace):
 
     else:
         SQL =  """(FEEDERID = {0})""".format(feederID)
-	
+    print SQL #! for testing only	
+    
     updateFields = ["WORKHEADQUARTERS"]
     feederField = "FEEDERID"
     workHQField = "WORKHEADQUARTERS"
     
-    for feeder in feederID:
+
 	
-	#set workspace
-	workspace = userWorkspace
+    #set workspace
+    workspace = userWorkspace
 
-	# Start an edit session. Must provide the worksapce.
-	edit = arcpy.da.Editor(workspace)
+    # Start an edit session. Must provide the worksapce.
+    edit = arcpy.da.Editor(workspace)
 
-	# Edit session is started without an undo/redo stack for versioned data
-	#  (for second argument, use False for unversioned data)
-	edit.startEditing(False, True)
+    # Edit session is started without an undo/redo stack for versioned data
+    #  (for second argument, use False for unversioned data)
+    edit.startEditing(False, True)
 
-	# Start an edit operation
-	edit.startOperation()
+    # Start an edit operation
+    edit.startOperation()
 
-	updateCursor = arcpy.da.UpdateCursor(dataPath,updateFields,SQL)
-	for row in updateCursor:
-	    row[0] = workHeadquarters
-	    updateCursor.updateRow(row)
-	del updateCursor
+    updateCursor = arcpy.da.UpdateCursor(dataPath,updateFields,SQL)
+    for row in updateCursor:
+        row[0] = workHeadquarters
+        updateCursor.updateRow(row)
+    del updateCursor
 
-	# Stop the edit operation.
-	edit.stopOperation()
+    # Stop the edit operation.
+    edit.stopOperation()
 
-    	# Stop the edit session and save the changes
-    	edit.stopEditing(True)
+    # Stop the edit session and save the changes
+    edit.stopEditing(True)
 #### End function ####
        
 #### Get input from user ####
 # Script input parameters:
-sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
-txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs 
-workHQ_input = arcpy.GetParameterAsText (2) # work headquarters code
-
+#!sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
+#!txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs 
+#!workHQ_input = arcpy.GetParameterAsText (2) # work headquarters code
+sdeWorkspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+#!txt_input = ['122601']
+workHQ_input = 'KAL'
 #makes a list of feeder IDs from a TXT file
-feederList = []
+feederList = ['122601']
+'''
 if txt_input :
     fhand = open(txt_input)
     for i in fhand:
         i = i.strip()
 	feederList.append(str(i))
     fhand.close()
+'''
 
 ###Data paths being updated by calculateHQ() function####
 
@@ -106,15 +111,12 @@ transformer = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Transformer".format(sdeWorks
 #!!!rb from voltage regulator fc subtypes 1, 5, 8, 11
 rb = "{0}\\ELECDIST.ElectricDist\\ELECDIST.VoltageRegulator".format(sdeWorkspace)
 
-#### Call and Execute function on ALL necessary FCs####
-calculateHQ(feederList, priOH, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, priUG, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, secOH, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, secUG, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, dynProDev, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, fuse, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, switch, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, miscNetFeat, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, capacitor, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, transformer, workHQ_input, sdeWorkspace)
-calculateHQ(feederList, regulatorBooster, workHQ_input, sdeWorkspace)
+#list of all data paths to loop through
+dataList = [priOH, priUG, secOH, secUG, dynProDev, fuse, switch, miscNetFeat, capacitor, transformer, rb]
+
+for feeder in feederList:
+    for data in dataList:
+	#### Call and Execute function on ALL necessary FCs####
+        calculateHQ(feeder, data, workHQ_input, sdeWorkspace)
+
+
