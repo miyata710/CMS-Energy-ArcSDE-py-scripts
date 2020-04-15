@@ -17,7 +17,7 @@ import arcpy
 import os
 
 #ArcMap Settings
-arcpy.env.addOutputsToMap = False
+arcpy.env.addOutputsToMap = False #!is this why cannot see updates in attribute table until I start manual edit session???
 
 #### Start function ####
 def calculateHQ(feederID,dataPath,workHeadquarters,userWorkspace):
