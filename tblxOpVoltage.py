@@ -15,8 +15,20 @@ def updateOpVoltage(opVoltage,dataPath,feederID,userWorkspace):
         SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 10) AND (INSTALLATIONTYPE <> 'UN' OR INSTALLATIONTYPE IS NULL) AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
 
     elif dataPath == rb:
-        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD = 1 OR SUBTYPECD = 5 OR SUBTYPECD = 8 OR SUBTYPECD = 11)AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
-
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD = 1 OR SUBTYPECD = 5 OR SUBTYPECD = 8 OR SUBTYPECD = 11) AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
+		
+    elif dataPath == priOH:
+		SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 7) AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
+        
+    elif dataPath == priUG:
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 7) AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
+	
+    elif dataPath == ohCon:
+		SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD = 07) AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
+		
+    elif dataPath == ugCon:
+		SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD = 7) AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
+		
     else:
         SQL =  """(FEEDERID = '{0}') AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
     
@@ -53,7 +65,7 @@ def updateOpVoltage(opVoltage,dataPath,feederID,userWorkspace):
 def secOpVoltage(dataPath,feederID,userWorkspace):
     
     #create an update cursor and update "OPERATINGVOLTAGE" field with opVoltage value
-    SQL =  """(FEEDERID = '{0}') AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= 30)""".format(feederID)
+    SQL =  """(FEEDERID = '{0}') AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE = 30)""".format(feederID)
     #Start Editing operation
     #set workspace
     workspace = userWorkspace
@@ -62,7 +74,6 @@ def secOpVoltage(dataPath,feederID,userWorkspace):
     edit = arcpy.da.Editor(workspace)
 
     # Edit session is started without an undo/redo stack for versioned data
-
     edit.startEditing(False, True)
 
     # Start an edit operation
@@ -85,36 +96,41 @@ def secOpVoltage(dataPath,feederID,userWorkspace):
 ########## END OF FUNCTION ##########
 
 # Script input parameters:
-#!sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
-#!txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs 
-sdeWorkspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
+txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs
 
 #makes a list of feeder IDs from a TXT file
-feederList = ['142702','142703']
-'''
+feederList = []
+
 if txt_input :
     fhand = open(txt_input)
     for i in fhand:
         i = i.strip()
 	feederList.append(str(i))
     fhand.close()
-'''
+
 ####Data paths being updated by updateOpVoltage() function####
 dynProDev = "{0}\\ELECDIST.ElectricDist\\ELECDIST.DynamicProtectiveDevice".format(sdeWorkspace)
 fuse = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Fuse".format(sdeWorkspace)
 miscNetFeat = "{0}\\ELECDIST.ElectricDist\\ELECDIST.MiscNetworkFeature".format(sdeWorkspace)
 #!!!capacitors from PF correcting  subtypes 1, 2
 capacitor = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PFCorrectingEquipment".format(sdeWorkspace)
-priOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriOHElectricLineSegment".format(sdeWorkspace) #updates OH Connector line
-priUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriUGElectricLineSegment".format(sdeWorkspace) #updates UG Connector line
+#!!! SUBTYPECD <> 7
+priOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriOHElectricLineSegment".format(sdeWorkspace)
+#!!! SUBTYPECD <> 7
+priUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriUGElectricLineSegment".format(sdeWorkspace) 
 switch = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Switch".format(sdeWorkspace)
 #!!!SUBTYPECD <> 10 and (INSTALLATIONTYPE <> 'UN' or INSTALLATIONTYPE is null)
 transformer = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Transformer".format(sdeWorkspace)
 #!!!rb from voltage regulator fc subtypes 1, 5, 8, 11
 rb = "{0}\\ELECDIST.ElectricDist\\ELECDIST.VoltageRegulator".format(sdeWorkspace)
+#!!!SUBTYPECD = 07 updates OH Connector line
+ohCon = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriOHElectricLineSegment".format(sdeWorkspace) 
+#!!!SUBTYPECD = 7 updates UG Connector line
+ugCon = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriUGElectricLineSegment".format(sdeWorkspace)
 
 #main data paths to loop through
-dataList = [dynProDev, fuse, miscNetFeat, capacitor, priOH, priUG, switch, transformer, rb]
+dataList = [dynProDev, fuse, miscNetFeat, capacitor, priOH, priUG, switch, transformer, rb, ohCon, ugCon]
 
 #### Data paths updated by secOpVoltage() function ####
 secOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecOHElectricLineSegment".format(sdeWorkspace)
@@ -134,9 +150,9 @@ hasIsolator = []
 for feeder in feederList: 
     ####Check input feederID for Isolators####
     #variables used for SQL statement
-    SQL = """SUBTYPECD = 10 AND FEEDERID = '{0}'""".format(feeder)
+    isoSQL = """SUBTYPECD = 10 AND FEEDERID = '{0}'""".format(feeder)
     
-    cursor = arcpy.da.SearchCursor(isolator, "FEEDERID", SQL)
+    cursor = arcpy.da.SearchCursor(isolator, "FEEDERID", isoSQL)
 
     #counter for counting number of rows returned from cursor
     count = 0 
@@ -148,9 +164,9 @@ for feeder in feederList:
     if count == 0: #execute code to find correct operating voltage
 
         #determine correct operating voltage value from circuit source table 
-        SQL = """FEEDERID = '{0}'""".format(feeder)
+        circSQL = """FEEDERID = '{0}'""".format(feeder)
     
-        cursor = arcpy.da.SearchCursor(circuitSource, "OPERATINGVOLTAGE", SQL)
+        cursor = arcpy.da.SearchCursor(circuitSource, "OPERATINGVOLTAGE", circSQL)
     
         for row in cursor:
             operatingVoltage = row[0]
