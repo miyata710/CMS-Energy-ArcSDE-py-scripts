@@ -4,17 +4,25 @@ This script is being developed for the purpose of updating the Operating Voltage
 are only updated on feeder IDs without isolators and any feeder IDs that contain isolators will be printed at the end of the program. 
 '''
 
-
 ########## FUNCTION TO UPDATE OPERATING VOLTAGE OF FEATURE CLASSES ##########
 
-def updateOpVoltage(opVoltage,dataPath,feederID): 
-  
-    #create an update cursor and update "OPERATINGVOLTAGE" field with opVoltage value
-    SQL =  """(FEEDERID = '{0}' AND NOT OPERATINGVOLTAGE = {1}) OR (FEEDERID = '{0}' AND OPERATINGVOLTAGE IS NULL)""".format(feederID, opVoltage)
+def updateOpVoltage(opVoltage,dataPath,feederID,userWorkspace):
+    #assign correct SQL statemnet
+    if dataPath == capacitor:
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD = 1 OR SUBTYPECD = 2) AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
+
+    elif dataPath == transformer:
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 10) AND (INSTALLATIONTYPE <> 'UN' OR INSTALLATIONTYPE IS NULL) AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
+
+    elif dataPath == rb:
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD = 1 OR SUBTYPECD = 5 OR SUBTYPECD = 8 OR SUBTYPECD = 11)AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
+
+    else:
+        SQL =  """(FEEDERID = '{0}') AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= '{1}')""".format(feederID,opVoltage)
     
     #Start Editing operation
     #set workspace
-    workspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+    workspace = userWorkspace
 
     # Start an edit session. Must provide the worksapce.
     edit = arcpy.da.Editor(workspace)
@@ -30,8 +38,8 @@ def updateOpVoltage(opVoltage,dataPath,feederID):
     updateCursor = arcpy.da.UpdateCursor(dataPath, "OPERATINGVOLTAGE", SQL)
     
     for row in updateCursor:
-      row[0] = str(opVoltage)
-      updateCursor.updateRow(row)
+        row[0] = str(opVoltage)
+        updateCursor.updateRow(row)
     del updateCursor
     
     # Stop the edit operation.
@@ -42,14 +50,13 @@ def updateOpVoltage(opVoltage,dataPath,feederID):
  ########## END OF FUNCTION ########## 
 
 ########## SECONDARY LINE OP VOLTAGE FUNCTION ##########
-def secOpVoltage(dataPath,feederID):
+def secOpVoltage(dataPath,feederID,userWorkspace):
     
     #create an update cursor and update "OPERATINGVOLTAGE" field with opVoltage value
-    SQL =  """(FEEDERID = '{0}' AND NOT OPERATINGVOLTAGE = 30) OR (FEEDERID = '{0}' AND OPERATINGVOLTAGE IS NULL)""".format(feederID)
-    
+    SQL =  """(FEEDERID = '{0}') AND (OPERATINGVOLTAGE IS NULL OR NOT OPERATINGVOLTAGE= 30)""".format(feederID)
     #Start Editing operation
     #set workspace
-    workspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+    workspace = userWorkspace
 
     # Start an edit session. Must provide the worksapce.
     edit = arcpy.da.Editor(workspace)
@@ -65,8 +72,8 @@ def secOpVoltage(dataPath,feederID):
     updateCursor = arcpy.da.UpdateCursor(dataPath, "OPERATINGVOLTAGE", SQL)
     
     for row in updateCursor:
-      row[0] = "30" 
-      updateCursor.updateRow(row)
+        row[0] = "30" 
+        updateCursor.updateRow(row)
     del updateCursor
     
     # Stop the edit operation.
@@ -76,91 +83,94 @@ def secOpVoltage(dataPath,feederID):
     edit.stopEditing(True)
 
 ########## END OF FUNCTION ##########
-  
 
+# Script input parameters:
+#!sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
+#!txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs 
+sdeWorkspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
+
+#makes a list of feeder IDs from a TXT file
+feederList = ['142702','142703']
+'''
+if txt_input :
+    fhand = open(txt_input)
+    for i in fhand:
+        i = i.strip()
+	feederList.append(str(i))
+    fhand.close()
+'''
 ####Data paths being updated by updateOpVoltage() function####
-dynamicProtectiveDevice = r'Devices\Protective Devices & Switches\Dynamic Protective Device'
-fuse = r'Devices\Protective Devices & Switches\Fuse'
-miscNetFeat = r'Misc Network Features\Tap Dots, T-points, & Wire Changes'
-capacitor = r'Devices\Primary Devices\Capacitors'
-priOH = r'Primary Lines\Primary Overhead Conductor'
-priUG = r'Primary Lines\Primary Underground Conductor'
-switch = r'Devices\Protective Devices & Switches\Switch'
-transformer = r'Customers & Transformers\Secondary Transformers'
-voltageRegulator = r'Devices\Primary Devices\Regulators & Boosters'
-ohConLine = r'Customers & Transformers\Transformer Connector Lines\OH Connector Line'
-ugConLine = r'Customers & Transformers\Transformer Connector Lines\UG Connector Line'
+dynProDev = "{0}\\ELECDIST.ElectricDist\\ELECDIST.DynamicProtectiveDevice".format(sdeWorkspace)
+fuse = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Fuse".format(sdeWorkspace)
+miscNetFeat = "{0}\\ELECDIST.ElectricDist\\ELECDIST.MiscNetworkFeature".format(sdeWorkspace)
+#!!!capacitors from PF correcting  subtypes 1, 2
+capacitor = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PFCorrectingEquipment".format(sdeWorkspace)
+priOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriOHElectricLineSegment".format(sdeWorkspace) #updates OH Connector line
+priUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriUGElectricLineSegment".format(sdeWorkspace) #updates UG Connector line
+switch = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Switch".format(sdeWorkspace)
+#!!!SUBTYPECD <> 10 and (INSTALLATIONTYPE <> 'UN' or INSTALLATIONTYPE is null)
+transformer = "{0}\\ELECDIST.ElectricDist\\ELECDIST.Transformer".format(sdeWorkspace)
+#!!!rb from voltage regulator fc subtypes 1, 5, 8, 11
+rb = "{0}\\ELECDIST.ElectricDist\\ELECDIST.VoltageRegulator".format(sdeWorkspace)
+
+#main data paths to loop through
+dataList = [dynProDev, fuse, miscNetFeat, capacitor, priOH, priUG, switch, transformer, rb]
 
 #### Data paths updated by secOpVoltage() function ####
-secOH = r'Customers & Transformers\Secondary Overhead Conductor'
-secUG = r'Customers & Transformers\Secondary Underground Conductor'
+secOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecOHElectricLineSegment".format(sdeWorkspace)
+secUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecUGElectricLineSegment".format(sdeWorkspace)
+
+#list of secondary data to loop through
+secList = [secOH, secUG]
 
 ####Input tables####
-isolator = r'Devices\Primary Devices\Isolator'
-circuitSource = r'E:\Data\EROlson\test.gdb\circuitSource'
-
-#### Initiate for loop to loop through list of Feeder IDs ####
-feederIDList = [
-'048601',
-'048602',
-'009901',
-'009902',
-'051601',
-'051602'
-]
+#!!! SUBTYPECD = 10
+isolator = "{0}\\ELECDIST.ElectricDist\ELECDIST.Transformer".format(sdeWorkspace)
+circuitSource = "{0}\\ELECDIST.CircuitSource".format(sdeWorkspace)
 
 #variable for tracking feeder IDs with isolators
 hasIsolator = []
 
-for feeder in feederIDList: 
-  ####Check input feederID for Isolators####
-  #variables used for SQL statement
-  SQL = """SUBTYPECD = 10 AND FEEDERID = '{0}'""".format(feeder)
-
-  cursor = arcpy.da.SearchCursor(isolator, "FEEDERID", SQL)
-
-  #counter for counting number of rows returned from cursor
-  count = 0 
-
-  for row in cursor:
-    count += 1
-  del cursor
-
-  if count == 0: #execute code to find correct operating voltage
-
-    #determine correct operating voltage value from circuit source table 
-    SQL = """FEEDERID = '{0}'""".format(feeder)
+for feeder in feederList: 
+    ####Check input feederID for Isolators####
+    #variables used for SQL statement
+    SQL = """SUBTYPECD = 10 AND FEEDERID = '{0}'""".format(feeder)
     
-    cursor = arcpy.da.SearchCursor(circuitSource, "OPERATINGVOLTAGE", SQL)
-    
+    cursor = arcpy.da.SearchCursor(isolator, "FEEDERID", SQL)
+
+    #counter for counting number of rows returned from cursor
+    count = 0 
+
     for row in cursor:
-      operatingVoltage = row[0]
+        count += 1
     del cursor
-    #!plan for if operating voltage = NULL?
-    
-    #call to function to update operating voltage 
-    updateOpVoltage(operatingVoltage,dynamicProtectiveDevice,feeder)
-    updateOpVoltage(operatingVoltage,fuse,feeder)
-    updateOpVoltage(operatingVoltage,miscNetFeat,feeder)
-    updateOpVoltage(operatingVoltage,capacitor,feeder)
-    updateOpVoltage(operatingVoltage,priOH,feeder)
-    updateOpVoltage(operatingVoltage,priUG,feeder)
-    updateOpVoltage(operatingVoltage,switch,feeder)
-    updateOpVoltage(operatingVoltage,transformer,feeder)
-    updateOpVoltage(operatingVoltage,voltageRegulator,feeder)
-    updateOpVoltage(operatingVoltage,ohConLine,feeder)
-    updateOpVoltage(operatingVoltage,ugConLine,feeder)
-    
-    #call secOpVoltage function
-    secOpVoltage(secOH,feeder)
-    secOpVoltage(secUG,feeder)
 
-  else:
-    hasIsolator.append(feeder)
+    if count == 0: #execute code to find correct operating voltage
+
+        #determine correct operating voltage value from circuit source table 
+        SQL = """FEEDERID = '{0}'""".format(feeder)
+    
+        cursor = arcpy.da.SearchCursor(circuitSource, "OPERATINGVOLTAGE", SQL)
+    
+        for row in cursor:
+            operatingVoltage = row[0]
+        del cursor
+        #!plan for if operating voltage = NULL?
+    
+        for data in dataList:
+            #call to function to update operating voltage 
+            updateOpVoltage(operatingVoltage,data,feeder,sdeWorkspace)
+    
+        for sec in secList: 
+            #call secOpVoltage function
+            secOpVoltage(sec,feeder,sdeWorkspace)
+
+    else:
+        hasIsolator.append(feeder)
     
 if len(hasIsolator) > 0:
-  #Print full list of feederIDs with isolators
-  print hasIsolator
-  
+    #Print full list of feederIDs with isolators
+    print ("Feeder ID's with isolators:")
+    print hasIsolator
 ### EOlson 09/2019 ###
 ### rosemary.erin.o@gmail.com ###
