@@ -1,9 +1,6 @@
 '''
 This script has been developed for the purpose of calculating the values for the Measured Length & Length Source fields.
 ####
-Issues:
-1) Do we need to include OH/UG connector lines?
-2) Should we be updating the "LENGTHSOURCE" field? Evidence this was being updated in one of Shelly's models.
 '''
 #Necessary modules 
 import arcpy
@@ -65,20 +62,18 @@ def calculateML(feederID,dataPath,userWorkspace):
 
 #### Get input from user ####
 # Script input parameters:
-#!sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
-sdeWorkspace = r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde'
-#!txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs
+sdeWorkspace = arcpy.GetParameterAsText (0) #SDE Connection file
+txt_input = arcpy.GetParameterAsText (1) # .txt file with feederIDs
 
 #makes a list of feeder IDs from a TXT file
-feederList = ['051602']
-'''
+feederList = []
+
 if txt_input :
     fhand = open(txt_input)
     for i in fhand:
         i = i.strip()
 	feederList.append(str(i))
     fhand.close()
-'''
 
 #Data Paths
 #!!! do we need to add OH/UG Connector lines to this script???
