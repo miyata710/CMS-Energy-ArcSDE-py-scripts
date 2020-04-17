@@ -10,13 +10,13 @@ import os
 def calculateML(feederID,dataPath,userWorkspace):
     #assign correct SQL statemnet
     if dataPath == priOH:
-        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 7)""".format(feederID)
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 7) AND (CONSTRUCTIONSTATUS = 50)""".format(feederID)
         
     elif dataPath == priUG:
-        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 7)""".format(feederID)
-
+        SQL =  """(FEEDERID = '{0}') AND (SUBTYPECD <> 7) AND (CONSTRUCTIONSTATUS = 50)""".format(feederID)
+    
     else:
-        SQL =  """(FEEDERID = '{0}')""".format(feederID)
+        SQL =  """(FEEDERID = '{0}') AND (CONSTRUCTIONSTATUS = 50)""".format(feederID)
     
     searchFields = ["OBJECTID","SHAPE@LENGTH"]
     updateFields = ["OBJECTID","MEASUREDLENGTH","LENGTHSOURCE"]
@@ -49,7 +49,7 @@ def calculateML(feederID,dataPath,userWorkspace):
     for item in updateCursor:
         myLength = myDict[item[0]]
         item[1] = round(myLength*3.28084) #!added round() function at Tierney's request.
-        item[2] = "FM" #!still in question
+        item[2] = "FM" 
         updateCursor.updateRow(item)
     del updateCursor
 
@@ -76,7 +76,6 @@ if txt_input :
     fhand.close()
 
 #Data Paths
-#!!! do we need to add OH/UG Connector lines to this script???
 #!!! SUBTYPECD <> 7
 priOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriOHElectricLineSegment".format(sdeWorkspace)
 #!!!SUBTYPECD <> 7
@@ -84,8 +83,8 @@ priUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.PriUGElectricLineSegment".format(s
 secOH = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecOHElectricLineSegment".format(sdeWorkspace)
 secUG = "{0}\\ELECDIST.ElectricDist\\ELECDIST.SecUGElectricLineSegment".format(sdeWorkspace)
 
-#!dataList = [priOH, priUG, secOH, secUG]
-dataList = [priOH]
+dataList = [priOH, priUG, secOH, secUG]
+
 #### Call and Execute calculate ML function on ALL necessary FCs####
 for feeder in feederList:
     for data in dataList:
