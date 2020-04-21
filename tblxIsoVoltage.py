@@ -5,6 +5,9 @@ This script was developed for the purpose of updating the Operating Voltage fiel
 for feeder IDs that have isolators on their circuit. This script is run by analysts as they traverse through known
 isolators, perform downstream traces, and update the voltages with the proper value assessed from the Seconday Transformer
 layer in the .mxd.  
+
+*will need to make a dictionary to store the OBJIDs of selected features & their data paths
+This should allow us to run the selection and retrieve all the selected features, have the data paths hard coded
 '''
 
 ########## FUNCTION TO UPDATE OPERATING VOLTAGE OF FEATURE CLASSES ##########
