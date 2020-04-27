@@ -47,6 +47,8 @@ def extract_data():
 
 lines,fu,dp,sw,sw_t,start=extract_data()
 
+#creates a dictionary of what exactly???
+#creates a nested list of ID values ( ID values probably correspond to start and end pts for lines???)
 def get_pt(edges):
     import functools 
     lines=[]
@@ -64,20 +66,24 @@ def get_pt(edges):
         line=[pt1,pt2] 
         lines.append(line)
     print 'number of lines: ',len(lines)
+    #!print pts_dict #!testing
+    #!print lines #!testing
     return pts_dict,lines
 
-p_dict,line_id=get_pt(lines)
+p_dict,line_id=get_pt(lines) 
 
+#creates a list of tuples sorted by (x) value from the p_dict dictionary
 pts_list=p_dict.items()
 pts_list.sort(key=lambda r:r[1][0])#sort based on x value,1s
 l=len(pts_list)
 
 dup_del=[]
 repl=[]
-for i in range(1,l):
-    if abs(pts_list[i][1][0]-pts_list[i-1][1][0])<0.01:
-        if abs(pts_list[i][1][1]-pts_list[i-1][1][1])<0.01:
-            print "warning: connection issues happens in ",pts_list[i],pts_list[i-1]
+for i in range(1,l): #!something wrong here "list index out of range"
+    print i #test only
+    if abs(pts_list[i][1][0]-pts_list[i-1][1][0])<0.01: #uses absolute value and minimum threshhold to determine if there is a snap/connect issue
+        if abs(pts_list[i][1][1]-pts_list[i-1][1][1])<0.01: #uses absolute value and minimum threshhold to determine if there is a snap/connect issue
+            print "warning: connection issues happens in ",pts_list[i],pts_list[i-1] #if there is a connectivity issue here what to do??
             # convert pts_list[i-1] to pts_list[i]
             # update line_id list
             d1=pts_list.pop(i-1)
@@ -85,6 +91,8 @@ for i in range(1,l):
             repl.append(pts_list[i][0]) 
 
 print len(dup_del),len(repl)
+
+#! what does this section of code do?
 
             for j in line_id:
                 if j[0]==pts_list[i-1][0]:
