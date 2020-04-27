@@ -67,18 +67,21 @@ def get_pt(edges):
     print 'number of lines: ',len(lines)
     return pts_dict,lines
 
+#!p_dict stores the coordinate of every point EX: 107: (474642.5370648198, 316852.6690776631)
+#!line_id stores the numbers assigned to the start and end point of every line EX: [105, 25]
 
-# p_dict,line_id=get_pt(lines)
+# p_dict,line_id=get_pt(lines) #!calls the function and assigns returned data to variables
+
 # revise connectivity
-pts_list=p_dict.items()
-pts_list.sort(key=lambda r:r[1][0])#sort based on x value,1s                                     
+pts_list=p_dict.items() #! converts data in p_dict into a list of tuples that is stored in pts_list
+pts_list.sort(key=lambda r:r[1][0]) #sort based on x value,1s                                     
 
 def binary_search(arr,key):
-    low=0
-    high=len(arr)-1
-    while (low<=high):
-        mid=(low+high)//2
-        a1=arr[mid][1]
+    low=0 #! index control
+    high=len(arr)-1 #! index control
+    while (low<=high): #! index control
+        mid=(low+high)//2 #! two division signs?
+        a1=arr[mid][1] #! use index value from mid variable assignment
         a2=key
         if a1==a2:
             return mid
@@ -86,13 +89,13 @@ def binary_search(arr,key):
             high=mid-1
         elif a2>a1:
             low=mid+1                   
-    return -1  
+    return -1  #! what does it mean if it returns -1???
 
 #assigns every node a number and associates device ID with it
 def convert_pt(devices,plist):
     pt_n={}
     for i in devices:
-        n=binary_search(plist,i[1])
+        n=binary_search(plist,i[1]) #checking for OBJID of device
         if n!=-1:
             #print n,i[0]
             pt_n[plist[n][0]]=i[0]
@@ -100,7 +103,7 @@ def convert_pt(devices,plist):
             #print n,i[0] 
     return pt_n
 ###!!!sort the point list based on x value, search the point recursively, and assign the point number to a device
-fu_pid=convert_pt(fu,pts_list)
+fu_pid=convert_pt(fu,pts_list) #!fu =[156443, (474414.3057046072, 317240.5703260244)]
 sw_pid=convert_pt(sw,pts_list)
 dp_pid=convert_pt(dp,pts_list)
 sw_t_pid=convert_pt(sw_t,pts_list)
@@ -108,6 +111,8 @@ start_pt=convert_pt(start,pts_list)
 start_pt=start_pt.items()[0][0]
 # [[321, (602357.8310077637, 246262.91547591984)]]
 
+#!reversed_graph is a dictionary
+#!revers graph has the graph data
 def create_graph(pts,edges):
     undirected_graph={}
     for v in pts:
