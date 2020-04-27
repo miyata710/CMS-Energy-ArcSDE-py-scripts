@@ -13,7 +13,7 @@ for row in cursor:
     tie_switch_feeder1.append(row[2])
     tie_switch_feeder2.append(row[3])
 
-tie_switch_fd_dict={}
+tie_switch_fd_dict={} #!key = tieSwitch OBJID & value = [feeder1, feeder2] {290: [u'163502', u'163503'], 287: [u'163502', u'163503']}
 for i in range(len(tie_switch_id)):
     tie_switch_fd_dict[tie_switch_id[i]]=[tie_switch_feeder1[i],tie_switch_feeder2[i]]
 
@@ -22,15 +22,14 @@ tie_switch_xy_dict={}
 for i in range(len(tie_switch_id)):
     tie_switch_xy_dict[tie_switch_id[i]]=tie_switch_xy[i]
 
-# this extracts the necessary feature class data per feederID
-#this code is giving me trouble....
-#works "better" coming from prod but still issues
+# this extracts the necessary feature class point data per feederID
+#!ex line: [[(474294.2619284954, 317313.8604380926), (474338.97104853706, 317364.00456613937)]]
+#!ex fuse: [[156487, (474142.8991123545, 317537.5111903009)]] has object ID for pt data and (x,y)
 def extract_data(fid):
     where="FEEDERID = '{}'".format(fid)
     cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PriOHElectricLineSegment',["SHAPE@"],"{} AND SUBTYPECD != 7 AND PHASEDESIGNATION = 7".format(where))
     PriOH=[i[0] for i in cursor]
     cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PriUGElectricLineSegment',["SHAPE@"],"{} AND SUBTYPECD != 7 AND PHASEDESIGNATION = 7".format(where))
-    #CODE RIGHT BELOW SEEMS TO FAIL???
     PriUG=[i[0] for i in cursor]
     Pri_lines=PriOH+PriUG
     lines=[[(i.firstPoint.X,i.firstPoint.Y),(i.lastPoint.X,i.lastPoint.Y)] for i in Pri_lines]
