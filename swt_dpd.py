@@ -26,24 +26,25 @@ for i in range(len(tie_switch_id)):
 #this code is giving me trouble....
 #works "better" coming from prod but still issues
 def extract_data(fid):
-    where="FEEDERID IS '{}'".format(fid)
-    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\PriOH',["SHAPE@","SHAPE.LEN"],"{} AND SUBTYPECD <> 7".format(where))
+    where="FEEDERID = '{}'".format(fid)
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PriOHElectricLineSegment',["SHAPE@"],"{} AND SUBTYPECD != 7 AND PHASEDESIGNATION = 7".format(where))
     PriOH=[i[0] for i in cursor]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\PriUG',["SHAPE@","SHAPE.LEN"],"{} AND SUBTYPECD <> 7".format(where))
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PriUGElectricLineSegment',["SHAPE@"],"{} AND SUBTYPECD != 7 AND PHASEDESIGNATION = 7".format(where))
     #CODE RIGHT BELOW SEEMS TO FAIL???
     PriUG=[i[0] for i in cursor]
     Pri_lines=PriOH+PriUG
     lines=[[(i.firstPoint.X,i.firstPoint.Y),(i.lastPoint.X,i.lastPoint.Y)] for i in Pri_lines]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\Fuse',["OID@","SHAPE@"],where)
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.Fuse',["OID@","SHAPE@"],where)
     fuse=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\DPD',["OID@","SHAPE@"],where)
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.DynamicProtectiveDevice',["OID@","SHAPE@"],where)
     dpd=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\DPD',["OID@","SHAPE@"],where+" and SUBSTATIONDEVICE='Y'")
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.DynamicProtectiveDevice',["OID@","SHAPE@"],where+" and SUBSTATIONDEVICE='Y'")
     start_p=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\Switch',["OID@","SHAPE@"],where+" and TieSwitchIndicator = 'Y'")
-    swi=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]  
-    return lines,fuse,dpd,swi,start_p
-
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.Switch',["OID@","SHAPE@"],where)
+    swi=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.Switch',["OID@","SHAPE@"],where +" and TieSwitchIndicator = 'Y' and (not FEEDERID IS NULL AND NOT FEEDERID2 IS NULL)")
+    sw_t=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]
+    return lines,fuse,dpd,swi,sw_t,start_p
 
 # lines,fu,dp,sw,sw_t,start=extract_data(f)
 
@@ -69,31 +70,9 @@ def get_pt(edges):
 
 
 # p_dict,line_id=get_pt(lines)
-
 # revise connectivity
 pts_list=p_dict.items()
-pts_list.sort(key=lambda r:r[1][0])#sort based on x value,1s
-
-l=len(pts_list)
-dup_del=[]
-repl=[]
-for i in range(1,l):
-    if abs(pts_list[i][1][0]-pts_list[i-1][1][0])<0.01:
-        if abs(pts_list[i][1][1]-pts_list[i-1][1][1])<0.01:
-            print "warning: connection issues happens in ",pts_list[i],pts_list[i-1]
-            # convert pts_list[i-1] to pts_list[i]
-            # update line_id list
-            d1=pts_list.pop(i-1)
-            dup_del.append(d1[0])
-            repl.append(pts_list[i][0]) 
-
-            for j in line_id:binary_search(arr,key)
-                if j[0]==pts_list[i-1][0]:
-                    j[0]=pts_list[i][0] 
-                if j[1]==pts_list[i-1][0]:
-                    j[1]=pts_list[i][0] 
-            pts_list.pop(i-1)
-                                       
+pts_list.sort(key=lambda r:r[1][0])#sort based on x value,1s                                     
 
 def binary_search(arr,key):
     low=0
@@ -110,6 +89,7 @@ def binary_search(arr,key):
             low=mid+1                   
     return -1  
 
+#assigns every node a number and associates device ID with it
 def convert_pt(devices,plist):
     pt_n={}
     for i in devices:
@@ -120,7 +100,7 @@ def convert_pt(devices,plist):
         #else:
             #print n,i[0] 
     return pt_n
-
+###!!!sort the point list based on x value, search the point recursively, and assign the point number to a device
 fu_pid=convert_pt(fu,pts_list)
 sw_pid=convert_pt(sw,pts_list)
 dp_pid=convert_pt(dp,pts_list)
@@ -132,8 +112,10 @@ start_pt=start_pt.items()[0][0]
 def create_graph(pts,edges):
     undirected_graph={}
     for v in pts:
+        print v
         undirected_graph[v[0]]=[]
     for i in edges:
+        print i
         if i[1] not in undirected_graph[i[0]]:
             undirected_graph[i[0]].append(i[1])
         if i[0] not in undirected_graph[i[1]]:
@@ -178,6 +160,7 @@ def get_paths(d_gr,r_gr):
             if node!=-1:
                 r.append(node)
         paths.append(r)
+    print paths
     return paths
 
 routs=get_paths(d_gr,r_gr)
@@ -185,29 +168,35 @@ for i in routs:
     i.reverse()
 
 
-# s_t: swich tie as s_t=[8,5]
-# device = [1,6,10]
-'''
-def get_near_dev(s_t,device):
+#! what exactly is this returning???
+def upstream_trace_device(reversed_graph, tie_switch, devices):
     st_rout={}
-    for i in routs:
-        for j in s_t:
+    for i in reversed_graph:
+        print i
+        for j in tie_switch:
+            print j
             if j in i:
-                st_rout[j]=i  
+                print "i'm in here"
+                st_rout[j]=i
+    print st_rout
     st_near_device=[]     
     for k in st_rout:
+        print k 
         k_inx=st_rout[k].index(k)   
         one_tie_sw=[]
-        for u in device:
+        for u in devices:
+            print u
             if u in st_rout[k]:
                 device_inx=st_rout[k].index(u)
+                print device_inx
                 one_tie_sw.append([k_inx, device_inx])
         st_near_device.append(one_tie_sw)
+    print st_near_device
     return st_near_device
-'''
-      
-get_near_dev(sw_t_pid.keys(),fu_pid.keys())
 
+      
+#!upstream_trace_device(routs,sw_t_pid.keys(),fu_pid.keys())
+upstream_trace_device(routs,sw_t_pid.keys(),p_dict.keys()) 
 # find the nearby switches
 
-get_near_dev(sw_t_pid.keys(),sw_pid.keys())
+upstream_trace_device(sw_t_pid.keys(),sw_pid.keys())
