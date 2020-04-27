@@ -1,8 +1,11 @@
-cursor=arcpy.da.SearchCursor(r'E:\Data\yfan\Connection to dgsep011.sde\ELECDIST.ElectricDist\ELECDIST.Switch',["OID@","SHAPE@","FEEDERID","FEEDERID2"],"TieSwitchIndicator = 'Y'")
+#changed this section to use a more restricting SQL cause to only collect data of valid tie switches
+SQL= "(TieSwitchIndicator = 'Y') and (not FEEDERID IS NULL AND NOT FEEDERID2 IS NULL)"
+cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\Switch',["OID@","SHAPE@","FEEDERID","FEEDERID2"],SQL)
 tie_switch_id=[]
 tie_switch_xy=[]
 tie_switch_feeder1=[]
 tie_switch_feeder2=[]
+
 for row in cursor:
     tie_switch_id.append(row[0])
     pt=row[1].firstPoint
@@ -12,33 +15,32 @@ for row in cursor:
 
 tie_switch_fd_dict={}
 for i in range(len(tie_switch_id)):
-    if tie_switch_feeder1[i] != None:
-        if tie_switch_feeder2[i] != None:    
-            tie_switch_fd_dict[tie_switch_id[i]]=[tie_switch_feeder1[i],tie_switch_feeder2[i]]
-        else:
-            tie_switch_fd_dict[tie_switch_id[i]]=[tie_switch_feeder1[i]]
-    
+    tie_switch_fd_dict[tie_switch_id[i]]=[tie_switch_feeder1[i],tie_switch_feeder2[i]]
+
+#creates dictionary of (x,y) values for valid tie switches key = OBJID : value = (x,y)
 tie_switch_xy_dict={}
 for i in range(len(tie_switch_id)):
     tie_switch_xy_dict[tie_switch_id[i]]=tie_switch_xy[i]
 
-
-
+# this extracts the necessary feature class data per feederID
+#this code is giving me trouble....
+#works "better" coming from prod but still issues
 def extract_data(fid):
-    where="feederid in {}".format(fid)
-    cursor=arcpy.da.SearchCursor(r'E:\Data\yfan\Connection to dgsep011.sde\ELECDIST.ElectricDist\ELECDIST.PriOHElectricLineSegment',["SHAPE@","SHAPE.LEN"],where+ " and SUBTYPECD!=7")
+    where="FEEDERID IS '{}'".format(fid)
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\PriOH',["SHAPE@","SHAPE.LEN"],"{} AND SUBTYPECD <> 7".format(where))
     PriOH=[i[0] for i in cursor]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\yfan\Connection to dgsep011.sde\ELECDIST.ElectricDist\ELECDIST.PriUGElectricLineSegment',["SHAPE@","SHAPE.LEN"],where+ " and SUBTYPECD!=7")
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\PriUG',["SHAPE@","SHAPE.LEN"],"{} AND SUBTYPECD <> 7".format(where))
+    #CODE RIGHT BELOW SEEMS TO FAIL???
     PriUG=[i[0] for i in cursor]
     Pri_lines=PriOH+PriUG
     lines=[[(i.firstPoint.X,i.firstPoint.Y),(i.lastPoint.X,i.lastPoint.Y)] for i in Pri_lines]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\yfan\Connection to dgsep011.sde\ELECDIST.ElectricDist\ELECDIST.Fuse',["OID@","SHAPE@"],where)
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\Fuse',["OID@","SHAPE@"],where)
     fuse=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\yfan\Connection to dgsep011.sde\ELECDIST.ElectricDist\ELECDIST.DynamicProtectiveDevice',["OID@","SHAPE@"],where)
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\DPD',["OID@","SHAPE@"],where)
     dpd=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\yfan\Connection to dgsep011.sde\ELECDIST.ElectricDist\ELECDIST.DynamicProtectiveDevice',["OID@","SHAPE@"],where+" and SUBSTATIONDEVICE='Y'")
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\DPD',["OID@","SHAPE@"],where+" and SUBSTATIONDEVICE='Y'")
     start_p=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]
-    cursor=arcpy.da.SearchCursor(r'E:\Data\yfan\Connection to dgsep011.sde\ELECDIST.ElectricDist\ELECDIST.Switch',["OID@","SHAPE@"],where+" and TieSwitchIndicator = 'Y'")
+    cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\Switch',["OID@","SHAPE@"],where+" and TieSwitchIndicator = 'Y'")
     swi=[[i[0],(i[1].firstPoint.X,i[1].firstPoint.Y)] for i in cursor]  
     return lines,fuse,dpd,swi,start_p
 
