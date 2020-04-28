@@ -13,23 +13,27 @@ for row in cursor:
     tie_switch_feeder1.append(row[2])
     tie_switch_feeder2.append(row[3])
 
-tie_switch_fd_dict={} #!key = tieSwitch OBJID & value = [feeder1, feeder2] {290: [u'163502', u'163503'], 287: [u'163502', u'163503']}
+tie_switch_fd_dict={}
 for i in range(len(tie_switch_id)):
     tie_switch_fd_dict[tie_switch_id[i]]=[tie_switch_feeder1[i],tie_switch_feeder2[i]]
-
+'''
+tie_switch_xy_dict
+{290: [475111.2571292563, 315974.3557968451], 287: [474206.93290441413, 316899.0348377063]}
+'''
 #creates dictionary of (x,y) values for valid tie switches key = OBJID : value = (x,y)
 tie_switch_xy_dict={}
 for i in range(len(tie_switch_id)):
     tie_switch_xy_dict[tie_switch_id[i]]=tie_switch_xy[i]
 
-# this extracts the necessary feature class point data per feederID
-#!ex line: [[(474294.2619284954, 317313.8604380926), (474338.97104853706, 317364.00456613937)]]
-#!ex fuse: [[156487, (474142.8991123545, 317537.5111903009)]] has object ID for pt data and (x,y)
+# this extracts the necessary feature class data per feederID
+#this code is giving me trouble....
+#works "better" coming from prod but still issues
 def extract_data(fid):
     where="FEEDERID = '{}'".format(fid)
     cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PriOHElectricLineSegment',["SHAPE@"],"{} AND SUBTYPECD != 7 AND PHASEDESIGNATION = 7".format(where))
     PriOH=[i[0] for i in cursor]
     cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PriUGElectricLineSegment',["SHAPE@"],"{} AND SUBTYPECD != 7 AND PHASEDESIGNATION = 7".format(where))
+    #CODE RIGHT BELOW SEEMS TO FAIL???
     PriUG=[i[0] for i in cursor]
     Pri_lines=PriOH+PriUG
     lines=[[(i.firstPoint.X,i.firstPoint.Y),(i.lastPoint.X,i.lastPoint.Y)] for i in Pri_lines]
@@ -67,21 +71,63 @@ def get_pt(edges):
     print 'number of lines: ',len(lines)
     return pts_dict,lines
 
-#!p_dict stores the coordinate of every point EX: 107: (474642.5370648198, 316852.6690776631)
-#!line_id stores the numbers assigned to the start and end point of every line EX: [105, 25]
 
-# p_dict,line_id=get_pt(lines) #!calls the function and assigns returned data to variables
-
+p_dict,line_id=get_pt(lines)
 # revise connectivity
-pts_list=p_dict.items() #! converts data in p_dict into a list of tuples that is stored in pts_list
-pts_list.sort(key=lambda r:r[1][0]) #sort based on x value,1s                                     
+pts_list=p_dict.items()
+pts_list.sort(key=lambda r:r[1][0])#sort based on x value,1s                                     
+
+#check the x,y distance between the points in sorted point list
+#if the x,y distance is less than 0.1 meter, there will be a incorrect connection between two lines
+for i in range(1,len(pts_list)):
+    if abs(pts_list[i][1][0]-pts_list[i-1][1][0])<0.1: #absolute x distance
+        if abs(pts_list[i][1][1]-pts_list[i-1][1][1])<0.1: #absolute y distance
+            print pts_list[i],pts_list[i-1]  
+'''
+print result:
+(56, (472855.1140231551, 315589.41198848665)) (86, (472855.11389515514, 315589.4122444866))
+(150, (472859.87639115955, 315585.44347648293)) (8, (472859.8760071596, 315585.4430284829))
+56,86 are same point
+150,8 are same point
+few connected primary 3_phased lines are not connected properly. 
+this problem could be solved by replace 86 by 56, replace 8 by 150
+following code solve the problem
+'''
+removed_pt=[]# store the pt needs to be removed
+replaced_pt=[]# store the pt needs to replace removed pt
+for i in range(1,len(pts_list)):
+    if abs(pts_list[i][1][0]-pts_list[i-1][1][0])<0.1: #absolute x distance
+        if abs(pts_list[i][1][1]-pts_list[i-1][1][1])<0.1: #absolute y distance
+            removed_pt.append(pts_list[i][0])
+            replaced_pt.append(pts_list[i-1][0])
+
+#remove the pt in pt_dictionary
+for i in range(len(removed_pt)):
+    p_dict.pop(removed_pt[i])
+#remove the pt in line_id,
+for i in line_id:
+    if i[0] in removed_pt:
+        ind1=removed_pt.index(i[0])
+        print ind1,i
+        i[0]=replaced_pt[ind1]
+        print i
+    if i[1] in removed_pt:
+        ind2=removed_pt.index(i[1])
+        print ind2
+        i[1]=replaced_pt[ind2]
+        print i
+
+#sort pt list again
+pts_list=p_dict.items()
+pts_list.sort(key=lambda r:r[1][0])
+
 
 def binary_search(arr,key):
-    low=0 #! index control
-    high=len(arr)-1 #! index control
-    while (low<=high): #! index control
-        mid=(low+high)//2 #! two division signs?
-        a1=arr[mid][1] #! use index value from mid variable assignment
+    low=0
+    high=len(arr)-1
+    while (low<=high):
+        mid=(low+high)//2
+        a1=arr[mid][1]
         a2=key
         if a1==a2:
             return mid
@@ -89,13 +135,13 @@ def binary_search(arr,key):
             high=mid-1
         elif a2>a1:
             low=mid+1                   
-    return -1  #! what does it mean if it returns -1???
+    return -1  
 
 #assigns every node a number and associates device ID with it
 def convert_pt(devices,plist):
     pt_n={}
     for i in devices:
-        n=binary_search(plist,i[1]) #checking for OBJID of device
+        n=binary_search(plist,i[1])
         if n!=-1:
             #print n,i[0]
             pt_n[plist[n][0]]=i[0]
@@ -103,7 +149,7 @@ def convert_pt(devices,plist):
             #print n,i[0] 
     return pt_n
 ###!!!sort the point list based on x value, search the point recursively, and assign the point number to a device
-fu_pid=convert_pt(fu,pts_list) #!fu =[156443, (474414.3057046072, 317240.5703260244)]
+fu_pid=convert_pt(fu,pts_list)
 sw_pid=convert_pt(sw,pts_list)
 dp_pid=convert_pt(dp,pts_list)
 sw_t_pid=convert_pt(sw_t,pts_list)
@@ -111,8 +157,6 @@ start_pt=convert_pt(start,pts_list)
 start_pt=start_pt.items()[0][0]
 # [[321, (602357.8310077637, 246262.91547591984)]]
 
-#!reversed_graph is a dictionary
-#!revers graph has the graph data
 def create_graph(pts,edges):
     undirected_graph={}
     for v in pts:
