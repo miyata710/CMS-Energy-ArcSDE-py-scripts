@@ -108,19 +108,20 @@ for i in range(len(removed_pt)):
 for i in line_id:
     if i[0] in removed_pt:
         ind1=removed_pt.index(i[0])
-        print ind1,i
+        #print ind1,i
         i[0]=replaced_pt[ind1]
-        print i
+        #print i
     if i[1] in removed_pt:
         ind2=removed_pt.index(i[1])
-        print ind2
+        #print ind2
         i[1]=replaced_pt[ind2]
-        print i
+        #print i
 
 #sort pt list again
 pts_list=p_dict.items()
 pts_list.sort(key=lambda r:r[1][0])
 
+print len(pts_list),len(line_id)
 
 def binary_search(arr,key):
     low=0
@@ -129,11 +130,11 @@ def binary_search(arr,key):
         mid=(low+high)//2
         a1=arr[mid][1]
         a2=key
-        if a1==a2:
+        if abs(a1[0]-a2[0])<=0.1:
             return mid
-        elif a2<a1:
+        elif a2[0]<a1[0]:
             high=mid-1
-        elif a2>a1:
+        elif a2[0]>a1[0]:
             low=mid+1                   
     return -1  
 
@@ -153,17 +154,18 @@ fu_pid=convert_pt(fu,pts_list)
 sw_pid=convert_pt(sw,pts_list)
 dp_pid=convert_pt(dp,pts_list)
 sw_t_pid=convert_pt(sw_t,pts_list)
+#{208: 910738, 30: 794897}
 start_pt=convert_pt(start,pts_list)
-start_pt=start_pt.items()[0][0]
+start_pt=start_pt.keys()[0]
 # [[321, (602357.8310077637, 246262.91547591984)]]
 
 def create_graph(pts,edges):
     undirected_graph={}
     for v in pts:
-        print v
+        #print v
         undirected_graph[v[0]]=[]
     for i in edges:
-        print i
+        #print i
         if i[1] not in undirected_graph[i[0]]:
             undirected_graph[i[0]].append(i[1])
         if i[0] not in undirected_graph[i[1]]:
@@ -174,8 +176,8 @@ def create_graph(pts,edges):
 
 
 
-start_pt
-p_dict
+#start_pt
+#p_dict
 
 def bfs(graph, initial):    
     import copy
