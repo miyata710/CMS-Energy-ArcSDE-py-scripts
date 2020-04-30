@@ -1,5 +1,7 @@
-#changed this section to use a more restricting SQL clause to only collect data of valid tie switches
-SQL= "(TieSwitchIndicator = 'Y') and (not FEEDERID IS NULL AND NOT FEEDERID2 IS NULL)"
+#####Start: Get Tie Switch Feature Information#####
+
+#SQL determines which Tie switches are valid and therefore selected
+SQL= "(TieSwitchIndicator = 'Y') and (NOT FEEDERID IS NULL AND NOT FEEDERID2 IS NULL)"
 cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\Switch',["OID@","SHAPE@","FEEDERID","FEEDERID2"],SQL)
 tie_switch_id=[]
 tie_switch_xy=[]
@@ -25,15 +27,14 @@ tie_switch_xy_dict={}
 for i in range(len(tie_switch_id)):
     tie_switch_xy_dict[tie_switch_id[i]]=tie_switch_xy[i]
 
+#####End: Tie switch information extraction#####
+
 # this extracts the necessary feature class data per feederID
-#this code is giving me trouble....
-#works "better" coming from prod but still issues
 def extract_data(fid):
     where="FEEDERID = '{}'".format(fid)
     cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PriOHElectricLineSegment',["SHAPE@"],"{} AND SUBTYPECD != 7 AND PHASEDESIGNATION = 7".format(where))
     PriOH=[i[0] for i in cursor]
     cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\PROD_ DGSEP011AsEROlson.sde\ELECDIST.ElectricDist\ELECDIST.PriUGElectricLineSegment',["SHAPE@"],"{} AND SUBTYPECD != 7 AND PHASEDESIGNATION = 7".format(where))
-    #CODE RIGHT BELOW SEEMS TO FAIL???
     PriUG=[i[0] for i in cursor]
     Pri_lines=PriOH+PriUG
     lines=[[(i.firstPoint.X,i.firstPoint.Y),(i.lastPoint.X,i.lastPoint.Y)] for i in Pri_lines]
@@ -56,19 +57,19 @@ def get_pt(edges):
     import functools 
     lines=[]
     p_s=list(set([functools.reduce(lambda x,y:x+y,edges)][0]))
-    print 'number of points: ',len(p_s)
+    print 'number of points: ',len(p_s) #! will we need these print statements?
     hash_pts=dict([[p_s[n],n] for n in range(len(p_s))])
-    print 'number of hash dict: ',len(hash_pts)
+    print 'number of hash dict: ',len(hash_pts)#! will we need these print statements?
     pts_dict={}
     for k in hash_pts:
         pts_dict[hash_pts[k]]=k
-    print 'number of pts: ',len(pts_dict)
+    print 'number of pts: ',len(pts_dict)#! will we need these print statements?
     for i in edges:
         pt1=hash_pts[i[0]]
         pt2=hash_pts[i[1]]   
         line=[pt1,pt2] 
         lines.append(line)
-    print 'number of lines: ',len(lines)
+    print 'number of lines: ',len(lines)#! will we need these print statements?
     return pts_dict,lines
 
 
@@ -82,7 +83,7 @@ pts_list.sort(key=lambda r:r[1][0])#sort based on x value,1s
 for i in range(1,len(pts_list)):
     if abs(pts_list[i][1][0]-pts_list[i-1][1][0])<0.1: #absolute x distance
         if abs(pts_list[i][1][1]-pts_list[i-1][1][1])<0.1: #absolute y distance
-            print pts_list[i],pts_list[i-1]  
+            print pts_list[i],pts_list[i-1]  #! will we need this print statements?
 '''
 print result:
 (56, (472855.1140231551, 315589.41198848665)) (86, (472855.11389515514, 315589.4122444866))
