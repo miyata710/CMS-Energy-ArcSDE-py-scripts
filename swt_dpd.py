@@ -124,7 +124,7 @@ pts_list.sort(key=lambda r:r[1][0])
 
 print len(pts_list),len(line_id)
 
-def binary_search(arr,key):
+def binary_search(arr,key): #trying to identify the index of key in arr
     low=0
     high=len(arr)-1
     while (low<=high):
@@ -132,12 +132,12 @@ def binary_search(arr,key):
         a1=arr[mid][1]
         a2=key
         if abs(a1[0]-a2[0])<=0.1:
-            return mid
+            return mid #when it finds a match
         elif a2[0]<a1[0]:
             high=mid-1
         elif a2[0]>a1[0]:
             low=mid+1                   
-    return -1  
+    return -1  #if no match is found
 
 #assigns every node a number and associates device ID with it
 def convert_pt(devices,plist):
@@ -146,11 +146,11 @@ def convert_pt(devices,plist):
         n=binary_search(plist,i[1])
         if n!=-1:
             #print n,i[0]
-            pt_n[plist[n][0]]=i[0]
+            pt_n[plist[n][0]]=i[0] #! creates a dictionary to relate edge x,y with its matching device x,y
         #else:
             #print n,i[0] 
     return pt_n
-###!!!sort the point list based on x value, search the point recursively, and assign the point number to a device
+###
 fu_pid=convert_pt(fu,pts_list)
 sw_pid=convert_pt(sw,pts_list)
 dp_pid=convert_pt(dp,pts_list)
