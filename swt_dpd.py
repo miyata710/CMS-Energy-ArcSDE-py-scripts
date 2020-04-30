@@ -1,3 +1,6 @@
+'''
+Developed by Erin Olson and Angela (Yi) Fan
+'''
 #changed this section to use a more restricting SQL clause to only collect data of valid tie switches
 SQL= "(TieSwitchIndicator = 'Y') and (not FEEDERID IS NULL AND NOT FEEDERID2 IS NULL)"
 cursor=arcpy.da.SearchCursor(r'E:\Data\EROlson\nodeTrace.gdb\Switch',["OID@","SHAPE@","FEEDERID","FEEDERID2"],SQL)
