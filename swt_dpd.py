@@ -52,24 +52,25 @@ def extract_data(fid):
 
 # lines,fu,dp,sw,sw_t,start=extract_data(f)
 
-
-def get_pt(edges):
+#!a line shares one or two points with its neighbor lines
+#!it removes duplication
+def get_pt(edges): #!this is where node number is assigned!!!
     import functools 
     lines=[]
     p_s=list(set([functools.reduce(lambda x,y:x+y,edges)][0]))
-    print 'number of points: ',len(p_s) #! will we need these print statements?
+    print 'number of points: ',len(p_s) #print total number of pts
     hash_pts=dict([[p_s[n],n] for n in range(len(p_s))])
-    print 'number of hash dict: ',len(hash_pts)#! will we need these print statements?
+    print 'number of hash dict: ',len(hash_pts)
     pts_dict={}
     for k in hash_pts:
         pts_dict[hash_pts[k]]=k
-    print 'number of pts: ',len(pts_dict)#! will we need these print statements?
+    print 'number of pts: ',len(pts_dict)
     for i in edges:
         pt1=hash_pts[i[0]]
         pt2=hash_pts[i[1]]   
         line=[pt1,pt2] 
         lines.append(line)
-    print 'number of lines: ',len(lines)#! will we need these print statements?
+    print 'number of lines: ',len(lines)
     return pts_dict,lines
 
 
@@ -139,7 +140,7 @@ def binary_search(arr,key): #trying to identify the index of key in arr
             low=mid+1                   
     return -1  #if no match is found
 
-#assigns every node a number and associates device ID with it
+
 def convert_pt(devices,plist):
     pt_n={}
     for i in devices:
@@ -150,7 +151,7 @@ def convert_pt(devices,plist):
         #else:
             #print n,i[0] 
     return pt_n
-###
+###pts_list is a list of (x,y) coordinates where a device is snapped to the end of a line (or where a device is splitting a line)
 fu_pid=convert_pt(fu,pts_list)
 sw_pid=convert_pt(sw,pts_list)
 dp_pid=convert_pt(dp,pts_list)
